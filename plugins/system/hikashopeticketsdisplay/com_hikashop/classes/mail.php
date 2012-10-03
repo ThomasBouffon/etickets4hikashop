@@ -1,10 +1,13 @@
 <?php
 /**
- * @package             HikaShop for Joomla!
- * @version             1.5.8
- * @author              hikashop.com - A few modifications by thomas.bouffon@gmail.com
+ * @package	     ETickets4Hikashop
+ * @version	     0.1
+ * @author           thomas.bouffon@gmail.com
+ * @from-package     HikaShop for Joomla!
+ * @from-version     1.5.8
+ * @from-author      hikashop.com
  * @copyright   (C) 2010-2012 HIKARI SOFTWARE. All rights reserved.
- * @license             GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 defined('_JEXEC') or die('Restricted access');
 ?>
