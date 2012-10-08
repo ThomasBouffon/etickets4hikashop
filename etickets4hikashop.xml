@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/component-install.dtd">
+<install type="component" version="1.5" method="upgrade">
+	<name>Hikashop Etickets Package</name>
+	<creationDate>April 2012</creationDate>
+	<version>1.0.0</version>
+	<author>Thomas Bouffon</author>
+	<authorEmail>thomas.bouffon@gmail.com</authorEmail>
+	<authorUrl>http://www.thomasbouffon.fr</authorUrl>
+	<copyright>Copyright (C) 2012 Thomas Bouffon EIRL - All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<description>This plugin enables you to generate etickets</description>
+	<files>
+		<filename>install.php</filename>
+		<folder>admin</folder>
+	</files>
+ 	<installfile>install.php</installfile>
+	<administration>
+		<files folder="admin">
+		<filename>index.html</filename>
+		<filename>etickets.zip</filename>
+		<filename>hikashopeticketsdisplay.zip</filename>
+		</files>
+	</administration>
+</install>
