@@ -12,7 +12,6 @@ defined('_JEXEC') or die('Restricted access');
 class plgHikashopEtickets extends JPlugin
 {
 	function plgHikashopEtickets(&$subject, $config){
-		error_log("Appel plugin");
 		parent::__construct($subject, $config);
 			if(!isset($this->params)){
 				$plugin =& JPluginHelper::getPlugin('hikashop', 'etickets');

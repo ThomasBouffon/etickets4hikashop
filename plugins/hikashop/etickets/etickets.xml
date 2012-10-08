@@ -14,18 +14,17 @@
 		<filename plugin="etickets">etickets.php</filename>
 		<filename plugin="etickets">index.html</filename>
 		<filename plugin="etickets">sql/install.sql</filename>
-		<filename plugin="etickets">sql/uninstall.sql</filename>
 	</files>
  	<install> <!-- Runs on install -->
 		<sql>
 			<file driver="mysql" charset="utf8">sql/install.sql</file>
 		</sql>
 	</install>
-	<uninstall> <!-- Runs on uninstall -->
+	<!--<uninstall> 
 		<sql>
 			<file driver="mysql" charset="utf8">sql/uninstall.sql</file>
 		</sql>
-	</uninstall>
+	</uninstall>-->
 
 	<params addpath="/components/com_hikashop/params">
 	</params>
