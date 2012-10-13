@@ -156,19 +156,17 @@ if(!empty($Itemid)){
 								$etickets = false;
 
 								$this->database =& JFactory::getDBO();
-								$query = 'SELECT category_id FROM '.hikashop_table('category').' WHERE category_name='."'etickets4hikashop'".' LIMIT 1';
+								$query = 'SELECT product_id FROM '.hikashop_table('eticket_info');
 								$this->database->setQuery($query);
-								$this->eTicketsCategoryId = $this->database->loadResult();
+
+								$this->eTicketProducts= $this->database->loadColumn();
+
 
 
 								foreach($this->order->products as $product){
-									$productClass=hikashop_get('class.product');
-									$productClass->getProducts($product->product_id);
-									$products=$productClass->products;
-									if (in_array($this->eTicketsCategoryId,$productClass->getCategories($product->product_id))) {
+									if(in_array($product->product_id,$this->eTicketProducts)){
 										$tickets=true;
 									}
-
 								}
 								if($this->invoice_type=='order' && $tickets){ $colspan++;; ?>
 								<th class="hikashop_order_item_tickets_title title">
@@ -303,9 +301,7 @@ if(!empty($Itemid)){
 									<?php if($this->invoice_type=='order' && $tickets){ ?>
 									<td class="hikashop_order_item_tickets_value">
 									<?php 
-										$productClass->getProducts($product->product_id);
-										$products=$productClass->products;
-										if (in_array($this->eTicketsCategoryId,$productClass->getCategories($product->product_id))) {
+										if(in_array($product->product_id,$this->eTicketProducts)){
 											$query = 'SELECT id FROM '.hikashop_table('etickets').' WHERE order_product_id='.$product->order_product_id;
 											error_log($query);
 											$this->database->setQuery($query);

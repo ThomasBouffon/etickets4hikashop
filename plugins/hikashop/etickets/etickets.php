@@ -19,9 +19,11 @@ class plgHikashopEtickets extends JPlugin
 					$this->params = new JParameter( $plugin->params );
 			}
 		$this->database =& JFactory::getDBO();
-		$query = 'SELECT category_id FROM '.hikashop_table('category').' WHERE category_name='."'etickets4hikashop'".' LIMIT 1';
+		$query = 'SELECT product_id FROM '.hikashop_table('eticket_info');
 		$this->database->setQuery($query);
-		$this->eTicketsCategoryId = $this->database->loadResult();
+
+		$this->eTicketProducts= $this->database->loadColumn();
+		#error_log("IDs:".var_export($this->eTicketProducts,true));
 	}
 	function createTickets(&$order_product,&$order_id){
 		for ($i=0;$i<$order_product->order_product_quantity;$i++) {
@@ -32,8 +34,8 @@ class plgHikashopEtickets extends JPlugin
 				$this->database->setQuery($query);
 				$idExists=$this->database->loadResult();
 			}
-			$query = 'insert into '.hikashop_table('etickets').' (id,order_product_id,order_id,status) values ('."'$id'".', '.$order_product->order_product_id.', '.$order_id.', 1);';
-			error_log("Insert $i:".$query);
+			$query = 'insert into '.hikashop_table('etickets').' (id,product_id,order_product_id,order_id,status) values ('."'$id'".', '.$order_product->product_id.', '.$order_product->order_product_id.', '.$order_id.', 1);';
+			#error_log("Insert $i:".$query);
 			$this->database->setQuery($query);
 			$this->database->query();
 		}
@@ -48,9 +50,9 @@ class plgHikashopEtickets extends JPlugin
 		foreach($fullOrder->products as $order_product) {
 			// We need to know if the product is an electornic ticket
 			$productClass=hikashop_get('class.product');
-			$productClass->getProducts($order_product->product_id);
-			if (!in_array($this->eTicketsCategoryId,$productClass->getCategories($order_product->order_product_id))) {
-				return true;
+			if( !in_array($order_product->product_id,$this->eTicketProducts)){
+				error_log("not an ETicket");
+				continue;
 			}
 			// We have an electronic ticket !
 			// Do the electronic tickets already exist ?
@@ -101,5 +103,60 @@ class plgHikashopEtickets extends JPlugin
 			$this->database->query();
 		}
 		return true;
+	}
+	function onProductFormDisplay(&$element,&$html) {
+		$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
+		$this->database->setQuery($query);
+		error_log($query);
+		$eTicketInfo=$this->database->loadObjectList();
+		if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
+		$view=new JView();
+		$view->eTicketInfo=$eTicketInfo[0];
+		$view->addTemplatePath(__DIR__ . '/tmpl/');
+		$view->setLayout("eTickets4HikashopForm");
+		$html[]=$view->loadTemplate();
+
+
+		return true;
+	}
+	function onAfterProductUpdate (&$element) {
+		error_log("AfterProductUpdate");
+		if (JFactory::getApplication()->getName() != "administrator") {
+			return true;
+		}
+		$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
+		$this->database->setQuery($query);
+		$wasEticket=0;
+		if(!is_null($this->database->loadResult())) {
+			$wasEticket=1;
+			$element->eTicketInfo=$this->database->loadObjectList();
+			$element->eTicketInfo=$element->eTicketInfo[0];
+		}
+		if (!is_null($element->eTicketInfo) && JRequest::getVar("et4hproductiseticket",'') != "on" ) {
+			$query = 'DELETE FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
+			$this->database->setQuery($query);
+			$this->database->query();
+
+		}
+		if (JRequest::getVar("et4hproductiseticket",'') == "on" ) {
+
+			$action="update";
+			if (is_null($element->eTicketInfo)) {
+				$element->eTicketInfo=new stdClass(); 
+				$action="insert";
+				$element->eTicketInfo->product_id=$element->product_id;
+
+			}
+			foreach(array('address','eventdate') as $field) {
+				$element->eTicketInfo->$field=JRequest::getVar("et4heticket$field",null);
+			}
+			if ($action=="update") {
+				$this->database->updateObject(hikashop_table('eticket_info'),$element->eTicketInfo,'product_id',true);
+			}
+			else {
+				$this->database->insertObject(hikashop_table('eticket_info'),$element->eTicketInfo);
+			}
+
+		}
 	}
 }
