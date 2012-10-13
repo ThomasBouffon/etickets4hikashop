@@ -49,9 +49,7 @@ class plgHikashopEtickets extends JPlugin
 			// We need to know if the product is an electornic ticket
 			$productClass=hikashop_get('class.product');
 			$productClass->getProducts($order_product->product_id);
-			$products=$productClass->products;
-			$product=$products[1];
-			if (!in_array($this->eTicketsCategoryId,$product->categories)) {
+			if (!in_array($this->eTicketsCategoryId,$productClass->getCategories($order_product->order_product_id))) {
 				return true;
 			}
 			// We have an electronic ticket !

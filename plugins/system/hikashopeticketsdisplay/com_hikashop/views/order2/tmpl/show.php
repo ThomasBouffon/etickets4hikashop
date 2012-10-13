@@ -165,8 +165,7 @@ if(!empty($Itemid)){
 									$productClass=hikashop_get('class.product');
 									$productClass->getProducts($product->product_id);
 									$products=$productClass->products;
-									$product=$products[1];
-									if (in_array($this->eTicketsCategoryId,$product->categories)) {
+									if (in_array($this->eTicketsCategoryId,$productClass->getCategories($product->product_id))) {
 										$tickets=true;
 									}
 
@@ -306,13 +305,14 @@ if(!empty($Itemid)){
 									<?php 
 										$productClass->getProducts($product->product_id);
 										$products=$productClass->products;
-										$fullProduct=$products[1];
-										if (in_array($this->eTicketsCategoryId,$fullProduct->categories)) {
+										if (in_array($this->eTicketsCategoryId,$productClass->getCategories($product->product_id))) {
 											$query = 'SELECT id FROM '.hikashop_table('etickets').' WHERE order_product_id='.$product->order_product_id;
 											error_log($query);
 											$this->database->setQuery($query);
 											$eTicketList=$this->database->loadResultArray();
+											error_log($query);
 											if (in_array($this->order->order_status, array( "confirmed","shipped")))  {
+											error_log($query);
 												foreach ($eTicketList as $key=>$value) {
 													$key+=1;
 													error_log('  <a href="?downloadticket=1&id='.$value.'">Ticket #'.$key+1 .'</a>');
