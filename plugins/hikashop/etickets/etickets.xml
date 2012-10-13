@@ -14,6 +14,7 @@
 		<filename plugin="etickets">etickets.php</filename>
 		<filename plugin="etickets">index.html</filename>
 		<filename plugin="etickets">sql/install.sql</filename>
+		<filename plugin="etickets">tmpl/etickets4hikashopform.php</filename>
 	</files>
  	<install> <!-- Runs on install -->
 		<sql>

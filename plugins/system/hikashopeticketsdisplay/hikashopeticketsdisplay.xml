@@ -14,6 +14,7 @@
 		<filename plugin="hikashopeticketsdisplay">hikashopeticketsdisplay.php</filename>
 		<filename plugin="hikashopeticketsdisplay">index.html</filename>
 		<folder>com_hikashop</folder>
+		<folder>lib</folder>
 	</files>
  	<install> <!-- Runs on install -->
 	</install>
