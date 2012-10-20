@@ -2,8 +2,8 @@
 <!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/plugin-install.dtd">
 <install type="plugin" version="2.5" method="upgrade" group="hikashop">
 	<name>Hikashop Etickets Plugin</name>
-	<creationDate>April 2010</creationDate>
-	<version>1.0.0</version>
+	<creationDate>October 2012</creationDate>
+	<version>0.2</version>
 	<author>Thomas Bouffon</author>
 	<authorEmail>thomas.bouffon@gmail.com</authorEmail>
 	<authorUrl>http://www.thomasbouffon.fr</authorUrl>
