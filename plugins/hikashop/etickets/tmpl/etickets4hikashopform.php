@@ -8,6 +8,9 @@
 	<input type="text" name="et4heticket<?php echo $field;?>" value="<?php if (isset($isEticket)) {echo $this->eTicketInfo->$field;}?>"></input>
 	<br>
 	<?php endforeach ;?>
+	<?php if (isset($isEticket)) : ?>
+	<a href="index.php?option=com_hikashopeticketspackage&action=getticketlist&product_id=<?php echo $this->eTicketInfo->product_id;?>&format=raw">Get sold tickets list (for validation)</a>
+	<?php endif;?>
 
 </fieldset>
 
