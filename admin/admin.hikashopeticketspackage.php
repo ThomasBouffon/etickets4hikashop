@@ -2,9 +2,8 @@
 
 $action=JRequest::getVar("action");
 $productId=JRequest::getVar("product_id","");
+$db = JFactory::getDBO();
 if ($action=="getticketlist") {
-
-	$db = JFactory::getDBO();
 	$query = 'SELECT * FROM #__hikashop_product WHERE product_id='.$productId;
 	$db->setQuery($query);
 	$infos=$db->loadObject();
@@ -31,5 +30,39 @@ if ($action=="getticketlist") {
 	}
 echo "\t</tickets>\n";
 echo "</event>\n";
+exit;
 }
+else if ($action == "saveconfig" ) {
+	$newCodeType=JRequest::getVar("codetype");
+	$query = "SELECT * FROM #__hikashop_eticket_config WHERE config_key='codetype'";
+	$db->setQuery($query);
+	if ($db->loadObject()) { 
+		$query = "DELETE FROM #__hikashop_eticket_config WHERE config_key='codetype'";
+		$db->setQuery($query);
+		$db->query();
+	}
+	$query = "INSERT into #__hikashop_eticket_config (config_key,config_value) values ('codetype','". $newCodeType ."');";
+	$db->setQuery($query);
+	$db->query();
+
+
+}
+$query = "SELECT * FROM #__hikashop_eticket_config WHERE config_key='codetype'";
+$db->setQuery($query);
+$conf=$db->loadObject();
+
+echo '<form action="index.php">';
+echo '<input type="hidden" name="option" value="com_hikashopeticketspackage">';
+echo '<input type="hidden" name="action" value="saveconfig">';
+echo '<fieldset class="adminform etickets4hikashop_config" id="htmlfieldset">';
+echo '<label for="codetype_barcode">Barcode</label> <input id="codetype_barcode" type="radio" name="codetype" value="barcode" ';
+	error_log(var_export($conf,true));
+if ($conf->config_value == 'barcode') { echo 'checked="checked"'; }
+echo '>';
+echo '<label for="codetype_qrcode">QRCode</label> <input id="codetype_qrcode" type="radio" name="codetype" value="qrcode" ';
+if ($conf->config_value == 'qrcode') { echo 'checked="checked"'; }
+echo '>';
+echo '<br><input type="submit" value="submit"></input>';
+echo '</fieldset>';
+echo '</form>';
 ?>

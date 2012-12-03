@@ -29,7 +29,7 @@ class plgHikashopEtickets extends JPlugin
 		for ($i=0;$i<$order_product->order_product_quantity;$i++) {
 			$idExists=true;
 			while ($idExists) {
-				$id=uniqid("",true);
+				$id=uniqid("",false);
 				$query = 'select id FROM '.hikashop_table('etickets').' WHERE id='.$id;
 				$this->database->setQuery($query);
 				$idExists=$this->database->loadResult();

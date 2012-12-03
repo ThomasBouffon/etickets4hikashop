@@ -735,12 +735,16 @@ $z++;
 	}
 	function createTicketFile ($eTicketID) {
 		error_log("Ticket : $eTicketID");
-		$codeType="barcode";
+		$db = JFactory::getDBO();
+		$query = "SELECT config_value FROM #__hikashop_eticket_config WHERE config_key='codetype'";
+		$db->setQuery($query);
+		$codeType=$db->loadResult();
+
 		ob_start (); 
 		if ($codeType == "barcode") {
 			require_once __DIR__ . '/../../lib/Image/Barcode2.php';
 			$enc=new Image_Barcode2();
-			$img=$enc->draw($eTicketID, Image_Barcode2::BARCODE_INT25,Image_Barcode2::IMAGE_PNG,false);
+			$img=$enc->draw($eTicketID, Image_Barcode2::BARCODE_CODE128,Image_Barcode2::IMAGE_PNG,false);
 
 		}
 		else if ($codeType == "qrcode") {
