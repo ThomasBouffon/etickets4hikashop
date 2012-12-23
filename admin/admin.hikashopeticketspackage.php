@@ -7,8 +7,8 @@ if ($action=="getticketlist") {
 	$query = 'SELECT * FROM #__hikashop_product WHERE product_id='.$productId;
 	$db->setQuery($query);
 	$infos=$db->loadObject();
-	#header('Content-Disposition: attachment; filename="ticketList-'.$productId.'.xml"');
-	#header('Content-type: application/xml');
+	header('Content-Disposition: attachment; filename="ticketList-'.$productId.'.xml"');
+	header('Content-type: application/xml');
 
 	echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 	echo "<event>\n";
