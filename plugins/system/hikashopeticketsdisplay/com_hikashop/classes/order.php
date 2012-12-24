@@ -186,7 +186,7 @@ $z=0;
 							foreach ($product->etickets as $l => $eticket) {
 								$attachObj = null;
 $z++;
-								$attachObj->filename = "ETicket$l.html";
+								$attachObj->filename = "ETicket$l.pdf";
 								$attachObj->contentAsText = $eticket->eTicketFile;
 								$attachObj->url = "http://localhost";
 								$attachs[] = $attachObj;
@@ -734,31 +734,13 @@ $z++;
 		return $result;
 	}
 	function createTicketFile ($eTicketID) {
+		require_once(__DIR__.'/../../lib/tcpdf/config/lang/fra.php');
+		require_once(__DIR__.'/../../lib/tcpdf/tcpdf.php');
+		$pdf=new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
 		error_log("Ticket : $eTicketID");
 		$db = JFactory::getDBO();
-		$query = "SELECT config_value FROM #__hikashop_eticket_config WHERE config_key='codetype'";
-		$db->setQuery($query);
-		$codeType=$db->loadResult();
-
-		ob_start (); 
-		if ($codeType == "barcode") {
-			require_once __DIR__ . '/../../lib/Image/Barcode2.php';
-			$enc=new Image_Barcode2();
-			$img=$enc->draw($eTicketID, Image_Barcode2::BARCODE_CODE128,Image_Barcode2::IMAGE_PNG,false);
-
-		}
-		else if ($codeType == "qrcode") {
-			require_once __DIR__ . '/../../lib/phpqrcode.php';
-			$enc=new QRencode();
-			$tab=$enc->encode($eTicketID,false);
-			$img=QRimage::image($tab,4,4);
-			}
-		ImagePng($img);
-		$image_data = '"data:image/png;base64,'.base64_encode(ob_get_clean ()).'"'; 
-		// Get ETicket info
-		
-		//ob_end_clean();
-		$query='SELECT a.* FROM '.hikashop_table('eticket_info').' AS a, '.hikashop_table('etickets').' AS b, '.hikashop_table('order_product').' AS c WHERE a.product_id=c.product_id AND c.order_product_id=b.order_product_id AND b.id=\''.$eTicketID."'";
+		$query='SELECT a.*,order_product_name FROM '.hikashop_table('eticket_info').' AS a, '.hikashop_table('etickets').' AS b, '.hikashop_table('order_product').' AS c WHERE a.product_id=c.product_id AND c.order_product_id=b.order_product_id AND b.id=\''.$eTicketID."'";
 		$this->database->setQuery($query);
 		$info=$this->database->loadObjectList();
 		$info=$info[0];
@@ -768,20 +750,35 @@ $z++;
 		$query='SELECT tn FROM '.hikashop_table('etickets').' WHERE id=\''.$eTicketID."'";
 		$this->database->setQuery($query);
 		$tn=$this->database->loadResult();
-		$HTML="<html>";
-		$HTML.="<head>\n <title>Your ETicket</title>\n <style type=\"text/css\">\n \n html { height: 100%; }\n body {\n margin: 20px; padding: 12px;\n direction: ltr;\n border:solid 1px;\n }\n .clear { clear:both;}\n #et4h_infos {\n float:left; \n }\n #et4h_codediv {\n float:right; \n }\n #et4h_barcode {\n width:250px;\n height:50px;\n border: 0px solid;\n }#et4h_qrcode {\n width:150px;\n height:150px;\n border: 0px solid;\n }\n </style>\n </head>\n";
-		$HTML.="<body>\n <h1>Organizer Name</h1>\n <h2>Event Name</h2>\n <div id=\"et4h_infos\">\n <ul>\n";
-		$HTML.="<li>Place : $info->address\n";
-		$HTML.="<li>Date : $info->eventdate\n";
-		$HTML.="<li>Price : ".sprintf("%.2f",$price)." &euro;\n";
-		$HTML.="<li>Ticket # : $tn </ul>\n </div>\n <div id=et4h_codediv>\n <img id=et4h_$codeType src=";
-		$HTML.=$image_data;
-		$HTML.="></img>\n </div>\n <div class=\"clear\"></div>\n";
-		$HTML.="</body>\n";
-		$HTML.="</html>";
+		$query = "SELECT config_value FROM #__hikashop_eticket_config WHERE config_key='codetype'";
+		$db->setQuery($query);
+		$codeType=$db->loadResult();
+		$view=new JView();
+                $view->addTemplatePath(__DIR__ . '/../views/order2/tmpl/');
 
-		return $HTML;
+		$view->setLayout("eticket");
+		$html=$view->loadTemplate();
+		$html=str_replace('ET4H_ADDRESS',$info->address,$html);
+		$html=str_replace('ET4H_EVENTDATE',$info->eventdate,$html);
+		$html=str_replace('ET4H_PRICE',sprintf("%.2f",$price),$html);
+		$html=str_replace('ET4H_TN',$tn,$html);
+		$config =& JFactory::getConfig();
+		$html=str_replace('ET4H_SITE_NAME',$config->getValue("config.sitename"),$html);
+		$html=str_replace('ET4H_EVENT_NAME',$info->order_product_name,$html);
+		if ($codeType == "barcode") {
+			$tcpdfParams = $pdf->serializeTCPDFtagParameters(array($eTicketID, 'C128','','','120','30' )); 
+			$html=str_replace('ET4H_BARCODE','<tcpdf method="write1DBarcode" params="'.$tcpdfParams.'" />',$html);
+		}
+		else if ($codeType == "qrcode") {
+			$tcpdfParams = $pdf->serializeTCPDFtagParameters(array($eTicketID, 'QRCODE,B','','','50','50' )); 
+			$html=str_replace('ET4H_BARCODE','<tcpdf method="write2DBarcode" params="'.$tcpdfParams.'" />',$html);
+		}
+$pdf->AddPage();
 
+		$pdf->writeHTML($html, true, false, true, false, '');
+
+
+		return $pdf->Output('',S);
 
 		}
 	}

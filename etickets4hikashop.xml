@@ -3,7 +3,7 @@
 <install type="component" version="2.5" method="upgrade">
 	<name>Hikashop Etickets Package</name>
 	<creationDate>October 2012</creationDate>
-	<version>0.4.1</version>
+	<version>0.5</version>
 	<author>Thomas Bouffon</author>
 	<authorEmail>thomas.bouffon@gmail.com</authorEmail>
 	<authorUrl>http://www.thomasbouffon.fr</authorUrl>

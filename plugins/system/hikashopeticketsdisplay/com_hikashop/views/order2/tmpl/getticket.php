@@ -14,9 +14,10 @@ defined('_JEXEC') or die('Restricted access');
 $order_id = hikashop_getCID('order_id');
 $class = hikashop_get('class.order');
 $order = $class->loadFullOrder($order_id);
-
+header('Content-type: application/pdf');
 #error_log(var_export($order,true));
 $eTicketID=JRequest::getVar('eTicketID');
+header('Content-Disposition: attachment; filename="ETicket-'.$eTicketID.'.pdf"');
 echo $class->createTicketFile($eTicketID);
 exit;
 ?>
