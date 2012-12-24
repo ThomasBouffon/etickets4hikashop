@@ -4,7 +4,7 @@ clean:
 	if [ -e admin/etickets.zip ] ; then rm admin/etickets.zip ; fi
 	if [ -e admin/hikashopeticketsdisplay.zip ] ; then rm admin/hikashopeticketsdisplay.zip; fi
 
-dist :
+dist : clean
 	cd plugins/hikashop/etickets ;\
 	pwd ; \
 	zip -r ../../../admin/etickets.zip .

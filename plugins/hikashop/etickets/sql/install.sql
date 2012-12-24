@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS  `#__hikashop_eticket_info` (
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS  `#__hikashop_eticket_config` (
-  `key` varchar(100) NOT NULL,
-  `value` varchar(100) NOT NULL,
- PRIMARY KEY  (`key`)
+  `config_key` varchar(100) NOT NULL,
+  `config_value` varchar(100) NOT NULL,
+ PRIMARY KEY  (`config_key`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
  
