@@ -3,7 +3,7 @@
 <install type="plugin" version="2.5" method="upgrade" group="hikashop">
 	<name>Hikashop Etickets Plugin</name>
 	<creationDate>October 2012</creationDate>
-	<version>0.5</version>
+	<version>1.0 beta</version>
 	<author>Thomas Bouffon</author>
 	<authorEmail>thomas.bouffon@gmail.com</authorEmail>
 	<authorUrl>http://www.thomasbouffon.fr</authorUrl>
@@ -14,18 +14,20 @@
 		<filename plugin="etickets">etickets.php</filename>
 		<filename plugin="etickets">index.html</filename>
 		<filename plugin="etickets">sql/install.sql</filename>
-		<filename plugin="etickets">tmpl/etickets4hikashopform.php</filename>
+		<folder>language</folder>
+		<folder>lib</folder>
+		<folder>tmpl</folder>
+
 	</files>
  	<install> <!-- Runs on install -->
 		<sql>
 			<file driver="mysql" charset="utf8">sql/install.sql</file>
 		</sql>
 	</install>
-	<!--<uninstall> 
-		<sql>
-			<file driver="mysql" charset="utf8">sql/uninstall.sql</file>
-		</sql>
-	</uninstall>-->
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.plg_hikashop_etickets.ini</language>
+		<language tag="fr-FR">fr-FR/fr-FR.plg_hikashop_etickets.ini</language>
+	</languages>
 
 	<params addpath="/components/com_hikashop/params">
 	</params>
