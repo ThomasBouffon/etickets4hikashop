@@ -22,8 +22,8 @@ defined('_JEXEC') or die('Restricted access');?>
 	<ul>
 
 	<?php 
-	if ($this->product->product_published && (empty($this->product->product_sale_end) || $this->product->product_sale_end<time())) { $productStillForSale=1;} else {$productStillForSale=0;}?>
-	<?php if (!$productStillForSale ) { ?>
+	if ($this->product->product_published && (empty($this->product->product_sale_end) || $this->product->product_sale_end>time())) { $productStillForSale=1;} else {$productStillForSale=0;}?>
+	<?php if ($productStillForSale ==0) { ?>
 	<li><a href="index.php?option=com_hikashop&ctrl=product&task=et4hgetticketlist&fmt=xml&cid=<?php echo $this->eTicketInfo->product_id;?>"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_GETTICKETLIST');?></a>
 	<li><a href="index.php?option=com_hikashop&ctrl=product&task=et4huploadxmlfile&cid=<?php echo $this->eTicketInfo->product_id;?>" class="modal" rel="{handler: 'iframe', size: {x: 680, y: 370}}"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_UPLOADXMLFILE');?></a></li>
 	<?php }
