@@ -1,8 +1,8 @@
 <?php
 /**
  * @package		ETickets4Hikashop
- * @version		1.0 beta
- * @hikashopVersion	1.5.8
+ * @version		1.0
+ * @hikashopVersion	1.5.8-2.0
  * @author		Thomas Bouffon - thomas.bouffon@gmail.com
  * @copyright		(C) . All rights reserved.
  * @license		GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,7 @@ class plgHikashopEtickets extends JPlugin
 
 		$this->eTicketProducts= $this->database->loadColumn();
 		$lang = JFactory::getLanguage();
-                $lang->load('plg_hikashop_etickets', __DIR__);
+                $lang->load('plg_hikashop_etickets', dirname(__FILE__));
 
 	}
 	function createTickets(&$order_product,&$order_id){
@@ -262,7 +262,8 @@ class plgHikashopEtickets extends JPlugin
 				else
 				{
 					$xmlInput=new SimpleXMLElement(file_get_contents($_FILES["et4hxmlfile"]["tmp_name"]));
-					$productFromXml=(string)$xmlInput->xpath('/event')[0]->attributes()->product_id;
+					$productFromXml=$xmlInput->xpath('/event');
+					$productFromXml=(string)$productFromXml[0]->attributes()->product_id;
 					if ($productFromXml != $productId ) {
 						echo "<h1>".JText::_("PLG_HIKASHOP_ETICKETS_ERROR")."</h1>";
 						echo JText::_("PLG_HIKASHOP_ETICKETS_WRONGPRODUCT");
@@ -318,8 +319,9 @@ class plgHikashopEtickets extends JPlugin
 		if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
 		$view=new JView();
 		$view->product=$element;
+		if ($this->debug) {error_log(var_export($element,true));}
 		$view->eTicketInfo=$eTicketInfo[0];
-		$view->addTemplatePath(__DIR__ . '/tmpl/');
+		$view->addTemplatePath(dirname(__FILE__) . '/tmpl/');
 		$view->setLayout("eTickets4HikashopForm");
 		$html[]=$view->loadTemplate();
 
@@ -382,8 +384,8 @@ class plgHikashopEtickets extends JPlugin
 
 	}
 	function createTicketFile ($eTicketID) {
-		require_once(__DIR__.'/lib/tcpdf/config/lang/fra.php');
-		require_once(__DIR__.'/lib/tcpdf/tcpdf.php');
+		require_once(dirname(__FILE__).'/lib/tcpdf/config/lang/fra.php');
+		require_once(dirname(__FILE__).'/lib/tcpdf/tcpdf.php');
 		$pdf=new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 		if ($this->debug) {error_log("Ticket : $eTicketID");}
@@ -399,15 +401,15 @@ class plgHikashopEtickets extends JPlugin
 		$this->database->setQuery($query);
 		$tn=$this->database->loadResult();
 		$view=new JView();
-		if(file_exists(JPATH_BASE."/images/etickets/".$info->order_product_code.".php")) {
+		if(file_exists(JPATH_ROOT."/images/etickets/".$info->order_product_code.".php")) {
 			ob_start();
-			include(JPATH_BASE."/images/etickets/".$info->order_product_code.".php");
+			include(JPATH_ROOT."/images/etickets/".$info->order_product_code.".php");
 			$html= ob_get_contents();
 			ob_end_clean();
 
 		}
 		else {
-			$view->addTemplatePath(__DIR__ . '/tmpl/');
+			$view->addTemplatePath(dirname(__FILE__) . '/tmpl/');
 			$view->setLayout("eticket");
 			$html=$view->loadTemplate();
 		}
