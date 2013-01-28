@@ -1,7 +1,7 @@
 <?php
 /**
  * @package		ETickets4Hikashop
- * @version		1.0
+ * @version		1.0.1
  * @hikashopVersion	1.5.8-2.0
  * @author		Thomas Bouffon - thomas.bouffon@gmail.com
  * @copyright		(C) . All rights reserved.
@@ -407,6 +407,12 @@ class plgHikashopEtickets extends JPlugin
 			$html= ob_get_contents();
 			ob_end_clean();
 
+		}
+		else if(file_exists(JPATH_ROOT."/images/etickets/eticket.php")) {
+			ob_start();
+			include(JPATH_ROOT."/images/etickets/eticket.php");
+			$html= ob_get_contents();
+			ob_end_clean();
 		}
 		else {
 			$view->addTemplatePath(dirname(__FILE__) . '/tmpl/');
