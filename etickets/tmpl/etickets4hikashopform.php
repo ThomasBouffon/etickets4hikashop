@@ -14,11 +14,11 @@ defined('_JEXEC') or die('Restricted access');?>
 		<label for="productiseticket"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_ISETICKET');?></label>
 			<?php if (!is_null($this->eTicketInfo)) {$isEticket=1; }?>
 			<input type="checkbox" name="et4hproductiseticket"<?php if (isset($isEticket)) {echo "checked=\"checked\"";}?>></input><br>
-			<?php foreach(array('address','eventdate') as $field) :?>
-			<label for="eticket<?php echo $field;?>"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_'.strtoupper($field));?></label>
-			<input type="text" name="et4heticket<?php echo $field;?>" value="<?php if (isset($isEticket)) {echo $this->eTicketInfo->$field;}?>"></input>
+			<label for="et4heticketaddress"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_ADDRESS');?></label>
+			<input type="text" name="et4heticketaddress" value="<?php if (isset($isEticket)) {echo $this->eTicketInfo->address;}?>"></input>
 			<br>
-			<?php endforeach ;?>
+			<label for="et4heticketeventdate"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_EVENTDATE');?></label>
+			<?php echo JHTML::_('calendar', hikashop_getDate((@$this->eTicketInfo->eventdate?@$this->eTicketInfo->eventdate:''),'%Y-%m-%d'), 'et4heticketeventdate','et4heticketeventdate','%Y-%m-%d','size="20"');?>
 			<?php if (isset($isEticket)) : ?>
 			<ul>
 
