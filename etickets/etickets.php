@@ -385,7 +385,9 @@ class plgHikashopEtickets extends JPlugin
 	}
 	function createTicketFile ($eTicketID) {
 		require_once(dirname(__FILE__).'/lib/tcpdf/config/lang/fra.php');
-		require_once(dirname(__FILE__).'/lib/tcpdf/tcpdf.php');
+		if(!class_exists('TCPDF')) {
+			require_once(dirname(__FILE__).'/lib/tcpdf/tcpdf.php');
+		}
 		$pdf=new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 		if ($this->debug) {error_log("Ticket : $eTicketID");}
