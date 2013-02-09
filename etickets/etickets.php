@@ -34,7 +34,7 @@ class plgHikashopEtickets extends JPlugin
 			$idExists=true;
 			while ($idExists) {
 				$id=uniqid("",false);
-				$query = 'select id FROM '.hikashop_table('etickets').' WHERE id='.$id;
+				$query = 'select id FROM '.hikashop_table('etickets').' WHERE id=\''.$id.'\'';
 				$this->database->setQuery($query);
 				$idExists=$this->database->loadResult();
 			}
@@ -44,7 +44,7 @@ class plgHikashopEtickets extends JPlugin
 		}
 	}
 	function getTicketListForOrder($order_id) {
-		$query = 'select id FROM '.hikashop_table('etickets').' WHERE order_id='.$order_id;
+		$query = 'select id FROM '.hikashop_table('etickets').' WHERE order_id=\''.$order_id.'\'';
 		if ($this->debug) {error_log(var_export($query,true));}
 		$this->database->setQuery($query);
 		$ret=array();
@@ -80,19 +80,19 @@ class plgHikashopEtickets extends JPlugin
 			}
 			// We have an electronic ticket !
 			// Do the electronic tickets already exist ?
-			$query = 'SELECT count(id) FROM '.hikashop_table('etickets').' WHERE order_product_id='.$order_product->order_product_id;
+			$query = 'SELECT count(id) FROM '.hikashop_table('etickets').' WHERE order_product_id=\''.$order_product->order_product_id.'\'';
 			$this->database->setQuery($query);
 			if ($this->database->loadResult()>0) {
 				if ($this->debug) {error_log("Tickets found");}
 				// If they do and the order is not confirmed nor shipped, delete them
 				if (!in_array($order->order_status, array( "confirmed","shipped")))  { 
 					if ($this->debug) {error_log("Deletion");}
-					$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_product_id='.$order_product->order_product_id;
+					$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_product_id=\''.$order_product->order_product_id.'\'';
 					$this->database->setQuery($query);
 					$this->database->query();
 				}
 				else {
-					$query = 'update '.hikashop_table('etickets').' set status=1 WHERE order_product_id='.$order_product->order_product_id;
+					$query = 'update '.hikashop_table('etickets').' set status=1 WHERE order_product_id=\''.$order_product->order_product_id.'\'';
 					$this->database->setQuery($query);
 					$this->database->query();
 				}
@@ -122,7 +122,7 @@ class plgHikashopEtickets extends JPlugin
 
 		foreach ($elements as $elt) {
 			if ($this->debug) {error_log("Deletion :".$elt);}
-			$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_id='.$elt;
+			$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_id=\''.$elt.'\'';
 			$this->database->setQuery($query);
 			$this->database->query();
 		}
@@ -136,20 +136,20 @@ class plgHikashopEtickets extends JPlugin
 		if ($action=="et4hgetticketlist") {
 			ob_clean();
 			$format=JRequest::getVar("fmt","");
-				$query = 'SELECT * FROM #__hikashop_product WHERE product_id='.$productId;
+				$query = 'SELECT * FROM #__hikashop_product WHERE product_id=\''.$productId.'\'';
 				$db->setQuery($query);
 				$infos=$db->loadObject();
 				$eventXml=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><event />');
 ?><?php
 				$eventXml->addAttribute("product_id","$productId");
-				$query = 'SELECT * FROM #__hikashop_eticket_info WHERE product_id='.$productId;
+				$query = 'SELECT * FROM #__hikashop_eticket_info WHERE product_id=\''.$productId.'\'';
 				$db->setQuery($query);
 				$infos=$db->loadObject();
 				$infosXml=$eventXml->addchild('info');
 				$infosXml->addchild('place',$infos->address);
 				$infosXml->addchild('date',$infos->eventdate);
 
-				$query = 'SELECT * FROM #__hikashop_etickets WHERE product_id='.$productId;
+				$query = 'SELECT * FROM #__hikashop_etickets WHERE product_id=\''.$productId.'\'';
 				$db->setQuery($query);
 				$tickets=$db->loadObjectList();
 				$ticketsXml=$eventXml->addChild('tickets');
@@ -313,11 +313,19 @@ class plgHikashopEtickets extends JPlugin
 		}
 	}
 	function onProductFormDisplay(&$element,&$html) {
-		$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
-		$this->database->setQuery($query);
-		$eTicketInfo=$this->database->loadObjectList();
-		if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
-		$view=new JView();
+		if (isset($element->product_id)) {
+			$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\'';
+			$this->database->setQuery($query);
+			$eTicketInfo=$this->database->loadObjectList();
+			if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
+		}
+		if (class_exists('hikashopBridgeView')) {
+			$view=new hikashopBridgeView();
+		}
+		else {
+			$view=new JView();
+		}
+
 		$view->product=$element;
 		if ($this->debug) {error_log(var_export($element,true));}
 		$view->eTicketInfo=$eTicketInfo[0];
@@ -331,7 +339,7 @@ class plgHikashopEtickets extends JPlugin
 		if (JFactory::getApplication()->getName() != "administrator") {
 			return true;
 		}
-		$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
+		$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\'';
 		$this->database->setQuery($query);
 		$wasEticket=0;
 		if(!is_null($this->database->loadResult())) {
@@ -340,7 +348,7 @@ class plgHikashopEtickets extends JPlugin
 			$element->eTicketInfo=$element->eTicketInfo[0];
 		}
 		if (!is_null($element->eTicketInfo) && JRequest::getVar("et4hproductiseticket",'') != "on" ) {
-			$query = 'DELETE FROM '.hikashop_table('eticket_info').' WHERE product_id='.$element->product_id;
+			$query = 'DELETE FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\'';
 			$this->database->setQuery($query);
 			$this->database->query();
 
@@ -402,7 +410,13 @@ class plgHikashopEtickets extends JPlugin
 		$query='SELECT tn FROM '.hikashop_table('etickets').' WHERE id=\''.$eTicketID."'";
 		$this->database->setQuery($query);
 		$tn=$this->database->loadResult();
-		$view=new JView();
+		if (class_exists('hikashopBridgeView')) {
+			$view=new hikashopBridgeView();
+		}
+		else {
+			$view=new JView();
+		}
+
 		if(file_exists(JPATH_ROOT."/images/etickets/".$info->order_product_code.".php")) {
 			ob_start();
 			include(JPATH_ROOT."/images/etickets/".$info->order_product_code.".php");
@@ -428,7 +442,12 @@ class plgHikashopEtickets extends JPlugin
 		$html=str_replace('ET4H_TN',$tn,$html);
 		$html=str_replace('ET4H_TICKETID',$eTicketID,$html);
 		$config =& JFactory::getConfig();
-		$html=str_replace('ET4H_SITE_NAME',$config->getValue("config.sitename"),$html);
+		if(!HIKASHOP_J30){
+			$html=str_replace('ET4H_SITE_NAME',$config->getValue("config.sitename"),$html);
+		} else {
+			$html=str_replace('ET4H_SITE_NAME',$config->get("sitename"),$html);
+		}
+
 		$html=str_replace('ET4H_EVENT_NAME',$info->order_product_name,$html);
 		$tcpdfParams = $pdf->serializeTCPDFtagParameters(array($eTicketID, 'C128','','','','20','10' )); 
 		$html=str_replace('ET4H_BARCODE','<tcpdf method="write1DBarcode" params="'.$tcpdfParams.'" />',$html);
