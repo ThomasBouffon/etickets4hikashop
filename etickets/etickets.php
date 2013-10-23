@@ -1,13 +1,24 @@
 <?php
 /**
  * @package		ETickets4Hikashop
- * @version		1.0.2
- * @hikashopVersion	1.5.8-2.0
+ * @version		1.0.5
+ * @hikashopVersion	1.5.8-2.2
  * @author		Thomas Bouffon - thomas.bouffon@gmail.com
  * @copyright		(C) . All rights reserved.
  * @license		GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 defined('_JEXEC') or die('Restricted access');
+jimport('joomla.log.log');
+JLog::addLogger(
+		array(
+			//Sets file name
+			'text_file' => 'plg_hikashop_etickets.errors.php'
+		     ),
+		//Sets all JLog messages to be set to the file
+		JLog::ALL,
+		//Chooses a category name
+		'plg_hikashop_etickets'
+	       );
 ?>
 <?php
 class plgHikashopEtickets extends JPlugin
@@ -45,14 +56,14 @@ class plgHikashopEtickets extends JPlugin
 	}
 	function getTicketListForOrder($order_id) {
 		$query = 'select id FROM '.hikashop_table('etickets').' WHERE order_id=\''.$order_id.'\'';
-		if ($this->debug) {error_log(var_export($query,true));}
+		if ($this->debug) { JLog::add(var_export($query,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 		$this->database->setQuery($query);
 		$ret=array();
 		$result=$this->database->loadObjectList();
-		if ($this->debug) {error_log("List:".var_export($result,true));}
+		if ($this->debug) { JLog::add("List:".var_export($result,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 		if ($result!=null) {
 			foreach ($result as $row) {
-			if ($this->debug) {error_log("id=".$row->id);}
+			if ($this->debug) { JLog::add("id=".$row->id, JLog::DEBUG, 'plg_hikashop_etickets');}
 			array_push($ret,$row->id);
 			}
 		}
@@ -65,17 +76,17 @@ class plgHikashopEtickets extends JPlugin
 		return $this->onAfterOrderUpdate($order,$send_email);
 	}
 	function onAfterOrderUpdate(&$order,&$send_email){
-		if ($this->debug) {error_log("Order update");}
+		if ($this->debug) { JLog::add("Order update", JLog::DEBUG, 'plg_hikashop_etickets');}
 		$class = hikashop_get('class.order');
-		$fullOrder= $class->loadFullOrder($order->order_id,true);
-		if ($this->debug) {error_log(var_export($fullOrder->products,true));}
+		$fullOrder= $class->loadFullOrder($order->order_id,true,false);
+		if ($this->debug) { JLog::add($fullOrder->order_status, JLog::DEBUG, 'plg_hikashop_etickets');}
 
 		foreach($fullOrder->products as $order_product) {
 			// We need to know if the product is an electornic ticket
 			$productClass=hikashop_get('class.product');
-			if ($this->debug) {error_log("ProdID: $order_product->product_id, Products:$this->eTicketProducts");}
+			if ($this->debug) { JLog::add("ProdID: $order_product->product_id, Products:$this->eTicketProducts", JLog::DEBUG, 'plg_hikashop_etickets');}
 			if( !in_array($order_product->product_id,$this->eTicketProducts)){
-				if ($this->debug) {error_log("not an ETicket");}
+				if ($this->debug) { JLog::add("not an ETicket", JLog::DEBUG, 'plg_hikashop_etickets');}
 				continue;
 			}
 			// We have an electronic ticket !
@@ -83,10 +94,10 @@ class plgHikashopEtickets extends JPlugin
 			$query = 'SELECT count(id) FROM '.hikashop_table('etickets').' WHERE order_product_id=\''.$order_product->order_product_id.'\'';
 			$this->database->setQuery($query);
 			if ($this->database->loadResult()>0) {
-				if ($this->debug) {error_log("Tickets found");}
+				if ($this->debug) { JLog::add("Tickets found", JLog::DEBUG, 'plg_hikashop_etickets');}
 				// If they do and the order is not confirmed nor shipped, delete them
 				if (!in_array($order->order_status, array( "confirmed","shipped")))  { 
-					if ($this->debug) {error_log("Deletion");}
+					if ($this->debug) { JLog::add("Deletion", JLog::DEBUG, 'plg_hikashop_etickets');}
 					$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_product_id=\''.$order_product->order_product_id.'\'';
 					$this->database->setQuery($query);
 					$this->database->query();
@@ -98,13 +109,14 @@ class plgHikashopEtickets extends JPlugin
 				}
 			}
 			else {
-				if ($this->debug) {error_log("No ticket found");}
+				if ($this->debug) { JLog::add("No ticket found", JLog::DEBUG, 'plg_hikashop_etickets');}
+				if ($this->debug) { JLog::add($order->order_status, JLog::DEBUG, 'plg_hikashop_etickets');}
 				// If they dont and the order is confirmed, create some
 				if (in_array($order->order_status, array( "confirmed","shipped")))  {
-					if ($this->debug) {error_log("Creation");}
+					if ($this->debug) { JLog::add("Creation", JLog::DEBUG, 'plg_hikashop_etickets');}
 					$orderProductQty=$order_product->order_product_quantity;
 					$this->createTickets($order_product,$order->order_id);
-					if ($this->debug) {error_log("ID : ".$order->order_id);}
+					if ($this->debug) { JLog::add("ID : ".$order->order_id, JLog::DEBUG, 'plg_hikashop_etickets');}
 
 
 				}
@@ -121,7 +133,7 @@ class plgHikashopEtickets extends JPlugin
 		}
 
 		foreach ($elements as $elt) {
-			if ($this->debug) {error_log("Deletion :".$elt);}
+			if ($this->debug) { JLog::add("Deletion :".$elt, JLog::DEBUG, 'plg_hikashop_etickets');}
 			$query = 'update '.hikashop_table('etickets').' set status=0 WHERE order_id=\''.$elt.'\'';
 			$this->database->setQuery($query);
 			$this->database->query();
@@ -129,7 +141,7 @@ class plgHikashopEtickets extends JPlugin
 		return true;
 	}
 	function onBeforeProductListingLoad( & $filters, & $order, &$view) {
-		if ($this->debug) {error_log("load");}
+		if ($this->debug) { JLog::add("load", JLog::DEBUG, 'plg_hikashop_etickets');}
 		$productId=JRequest::getVar("cid","");
 		$db = JFactory::getDBO();
 		$action=JRequest::getVar("task");
@@ -177,7 +189,7 @@ class plgHikashopEtickets extends JPlugin
 				$document->addStyleSheet('templates/system/css/system.css');
 				$document->addStyleSheet('templates/'.JFactory::getApplication()->getTemplate().'/css/template.css');
 				$head=$document->loadRenderer('head')->render();
-				if ($this->debug) {error_log("html");}
+				if ($this->debug) { JLog::add("html", JLog::DEBUG, 'plg_hikashop_etickets');}
 				$xsl='<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<xsl:output
 					method="xml"
@@ -308,7 +320,7 @@ class plgHikashopEtickets extends JPlugin
 		$action=JRequest::getVar("action");
 		if ($action=="showtable") {
 			//ob_clean();
-			if ($this->debug) {error_log("showtable");}
+			if ($this->debug) { JLog::add("showtable", JLog::DEBUG, 'plg_hikashop_etickets');}
 			return false;
 		}
 	}
@@ -327,7 +339,7 @@ class plgHikashopEtickets extends JPlugin
 		}
 
 		$view->product=$element;
-		if ($this->debug) {error_log(var_export($element,true));}
+		if ($this->debug) { JLog::add(var_export($element,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 		$view->eTicketInfo=$eTicketInfo[0];
 		$view->addTemplatePath(dirname(__FILE__) . '/tmpl/');
 		$view->setLayout("eTickets4HikashopForm");
@@ -379,7 +391,7 @@ class plgHikashopEtickets extends JPlugin
 		$order_id=$mail->data->order_id;
 		if (! $order_id) {return true;}
 		$ticketList=$this->getTicketListForOrder($order_id);
-		if ($this->debug) {error_log(var_export($ticketList,true));}
+		if ($this->debug) { JLog::add(var_export($ticketList,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 		foreach($ticketList as $ticketId) {
 			$attachObj=null;
 			$attachObj->filename="Ticket-".$ticketId.".pdf";
@@ -398,7 +410,7 @@ class plgHikashopEtickets extends JPlugin
 		}
 		$pdf=new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-		if ($this->debug) {error_log("Ticket : $eTicketID");}
+		if ($this->debug) { JLog::add("Ticket : $eTicketID", JLog::DEBUG, 'plg_hikashop_etickets');}
 		$db = JFactory::getDBO();
 		$query='SELECT a.*,order_product_name,order_product_code FROM '.hikashop_table('eticket_info').' AS a, '.hikashop_table('etickets').' AS b, '.hikashop_table('order_product').' AS c WHERE a.product_id=c.product_id AND c.order_product_id=b.order_product_id AND b.id=\''.$eTicketID."'";
 		$this->database->setQuery($query);
@@ -466,7 +478,7 @@ class plgHikashopEtickets extends JPlugin
 			$order_id=$order->order_id;
 			if (! $order_id) {return true;}
 			$ticketList=$this->getTicketListForOrder($order_id);
-			if ($this->debug) {error_log(var_export($ticketList,true));}
+			if ($this->debug) { JLog::add(var_export($ticketList,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 			$eTicketID=JRequest::getVar("eTicketID");
 			if ($eTicketID && in_array($eTicketID,$ticketList)) {
 				ob_clean();
