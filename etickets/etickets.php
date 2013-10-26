@@ -160,8 +160,27 @@ class plgHikashopEtickets extends JPlugin
 				$infosXml=$eventXml->addchild('info');
 				$infosXml->addchild('place',$infos->address);
 				$infosXml->addchild('date',$infos->eventdate);
+				//Characteristic titles
+				$query = 'SELECT characteristic_id ,characteristic_value FROM #__hikashop_characteristic WHERE characteristic_parent_id=0;';
+				$db->setQuery($query);
+				$charTitles=$db->loadAssocList('characteristic_id');
 
-				$query = 'SELECT * FROM #__hikashop_etickets WHERE product_id=\''.$productId.'\'';
+				//Variants
+				$query = 'SELECT p.product_id, c.characteristic_parent_id, c.characteristic_value FROM #__hikashop_product p,#__hikashop_variant v, #__hikashop_characteristic c WHERE p.product_parent_id=\''.$productId.'\' AND v.variant_product_id=p.product_id AND v.variant_characteristic_id=c.characteristic_id';
+				$db->setQuery($query);
+				$variants=$db->loadObjectList();
+				foreach ($variants as $key=>$variant) {
+					error_log(var_export($variantXml,true));
+					$variantXml=$infosXml->addchild('variant');
+					$variant->characteristic_parent_id=$charTitles[$variant->characteristic_parent_id][characteristic_value];
+					foreach($variant as $k=>$v) {
+						$variantXml->addAttribute($k,$v);
+					}
+
+				}
+
+
+				$query = 'SELECT e.* FROM #__hikashop_etickets e,#__hikashop_product p WHERE e.product_id=p.product_id and (p.product_id=\''.$productId.'\' or p.product_parent_id=\''.$productId.'\')';
 				$db->setQuery($query);
 				$tickets=$db->loadObjectList();
 				$ticketsXml=$eventXml->addChild('tickets');
@@ -175,9 +194,8 @@ class plgHikashopEtickets extends JPlugin
 					foreach($ticket as $k=>$v) {
 						$ticketXml->addAttribute($k,$v);
 					}
-
-
 				}
+
 			if($format=="xml") {
 				header('Content-Disposition: attachment; filename="ticketList-'.$productId.'.xml"');
 				header('Content-type: application/xml');

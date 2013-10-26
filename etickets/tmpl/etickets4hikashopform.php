@@ -28,6 +28,10 @@ defined('_JEXEC') or die('Restricted access');?>
 			<label for="et4heticketeventdate_forall"><?php echo JText::_('PLG_HIKASHOP_ETICKETS_FORALLVARIANTS');?></label>
 			<?php endif;?>
 			<?php if (isset($isEticket)) : ?>
+			<br>
+			<?php if ($this->product->product_parent_id ==0 ) {echo JText::_('PLG_HIKASHOP_ETICKETS_FORALLVARIANTS')." :";}
+			else {echo ucfirst(JText::_('PLG_HIKASHOP_ETICKETS_FORPRODUCT'))." :";}
+			?>
 			<ul>
 
 			<?php 
