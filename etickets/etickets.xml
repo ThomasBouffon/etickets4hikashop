@@ -3,11 +3,11 @@
 <extension type="plugin" version="2.5" method="upgrade" group="hikashop">
 	<name>Hikashop Etickets Plugin</name>
 	<creationDate>October 2012</creationDate>
-	<version>1.0.2</version>
+	<version>1.0.5</version>
 	<author>Thomas Bouffon</author>
 	<authorEmail>thomas.bouffon@gmail.com</authorEmail>
 	<authorUrl>http://www.thomasbouffon.fr</authorUrl>
-	<copyright>Copyright (C) 2012 Thomas Bouffon EIRL - All rights reserved.</copyright>
+	<copyright>Copyright (C) 2013 Thomas Bouffon EIRL - All rights reserved.</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<description>This plugin enables you to generate etickets</description>
 	<files>
