@@ -339,7 +339,7 @@ class plgHikashopEtickets extends JPlugin
 		}
 
 		$view->product=$element;
-		if ($this->debug) { JLog::add(var_export($element,true), JLog::DEBUG, 'plg_hikashop_etickets');}
+		#if ($this->debug) { JLog::add(var_export($element,true), JLog::DEBUG, 'plg_hikashop_etickets');}
 		$view->eTicketInfo=$eTicketInfo[0];
 		$view->addTemplatePath(dirname(__FILE__) . '/tmpl/');
 		$view->setLayout("eTickets4HikashopForm");
@@ -348,6 +348,7 @@ class plgHikashopEtickets extends JPlugin
 		return true;
 	}
 	function onAfterProductUpdate (&$element) {
+		if ($this->debug) { JLog::add("Product Update:".$element->product_id, JLog::DEBUG, 'plg_hikashop_etickets');}
 		if (JFactory::getApplication()->getName() != "administrator") {
 			return true;
 		}
@@ -360,7 +361,7 @@ class plgHikashopEtickets extends JPlugin
 			$element->eTicketInfo=$element->eTicketInfo[0];
 		}
 		if (!is_null($element->eTicketInfo) && JRequest::getVar("et4hproductiseticket",'') != "on" ) {
-			$query = 'DELETE FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\'';
+			$query = 'DELETE FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\' or product_parent_id=\''.$element->product_id.'\'';
 			$this->database->setQuery($query);
 			$this->database->query();
 
@@ -382,6 +383,45 @@ class plgHikashopEtickets extends JPlugin
 			}
 			else {
 				$this->database->insertObject(hikashop_table('eticket_info'),$element->eTicketInfo);
+			}
+			// Variants ?
+			if ($this->debug) { JLog::add("Variants?", JLog::DEBUG, 'plg_hikashop_etickets');}
+			if ($this->debug) { JLog::add(var_export($element->characteristics,true), JLog::DEBUG, 'plg_hikashop_etickets');}
+			if (count($element->characteristics)!=0) {
+if ($this->debug) { JLog::add("Variants", JLog::DEBUG, 'plg_hikashop_etickets');}
+
+				$query='SELECT * from  '.hikashop_table('product').' WHERE product_parent_id=\''.$element->product_id.'\'';
+				$this->database->setQuery($query);
+				if(!is_null($this->database->loadResult())) {
+					$variants=$this->database->loadObjectList();
+					foreach ($variants as $key=>$variant) {
+						if ($this->debug) { JLog::add($key.":".$variant->product_id, JLog::DEBUG, 'plg_hikashop_etickets');}
+						$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$variant->product_id.'\'';
+						$this->database->setQuery($query);
+						$wasEticket=0;
+						if(!is_null($this->database->loadResult())) {
+							$action="update";
+							$variant->eTicketInfo=$this->database->loadObjectList();
+						}
+						else {
+							$variant->eTicketInfo=new stdClass(); 
+							$action="insert";
+							$variant->eTicketInfo->product_id=$variant->product_id;
+
+						}
+						foreach(array('address','eventdate') as $field) {
+							if (!defined($variant->eTicketInfo->$field)||JRequest::getVar("et4heticket".$field."_forall")=="on") { 
+								$variant->eTicketInfo->$field=JRequest::getVar("et4heticket$field",null);
+							}
+						}
+						if ($action=="update") {
+							$this->database->updateObject(hikashop_table('eticket_info'),$variant->eTicketInfo,'product_id',true);
+						}
+						else {
+							$this->database->insertObject(hikashop_table('eticket_info'),$variant->eTicketInfo);
+						}
+					}
+				}
 			}
 
 		}
