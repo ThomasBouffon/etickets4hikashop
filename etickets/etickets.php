@@ -170,7 +170,6 @@ class plgHikashopEtickets extends JPlugin
 				$db->setQuery($query);
 				$variants=$db->loadObjectList();
 				foreach ($variants as $key=>$variant) {
-					error_log(var_export($variantXml,true));
 					$variantXml=$infosXml->addchild('variant');
 					$variant->characteristic_parent_id=$charTitles[$variant->characteristic_parent_id][characteristic_value];
 					foreach($variant as $k=>$v) {
