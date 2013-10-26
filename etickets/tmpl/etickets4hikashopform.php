@@ -1,7 +1,7 @@
 <?php
 /**
  * @package		ETickets4Hikashop
- * @version		1.0.5
+ * @version		1.1
  * @hikashopVersion	1.5.8-2.2
  * @author		Thomas Bouffon - thomas.bouffon@gmail.com
  * @copyright		(C) . All rights reserved.
