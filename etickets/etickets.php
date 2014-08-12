@@ -26,12 +26,12 @@ class plgHikashopEtickets extends JPlugin
 	function plgHikashopEtickets(&$subject, $config){
 		parent::__construct($subject, $config);
 		if(!isset($this->params)){
-			$plugin =& JPluginHelper::getPlugin('hikashop', 'etickets');
+			$plugin = JPluginHelper::getPlugin('hikashop', 'etickets');
 			jimport('joomla.html.parameter');
 			$this->params = new JParameter( $plugin->params );
 		}
 		$this->debug=0;
-		$this->database =& JFactory::getDBO();
+		$this->database = JFactory::getDBO();
 		$query = 'SELECT product_id FROM '.hikashop_table('eticket_info');
 		$this->database->setQuery($query);
 
@@ -346,8 +346,8 @@ class plgHikashopEtickets extends JPlugin
 			$query = 'SELECT * FROM '.hikashop_table('eticket_info').' WHERE product_id=\''.$element->product_id.'\'';
 			$this->database->setQuery($query);
 			$eTicketInfo=$this->database->loadObjectList();
-			if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
 		}
+		if (!isset($eTicketInfo)) {$eTicketInfo=array(null);}
 		if (class_exists('hikashopBridgeView')) {
 			$view=new hikashopBridgeView();
 		}
@@ -510,7 +510,7 @@ if ($this->debug) { JLog::add("Variants", JLog::DEBUG, 'plg_hikashop_etickets');
 		$html=str_replace('ET4H_PRICE',sprintf("%.2f",$price),$html);
 		$html=str_replace('ET4H_TN',$tn,$html);
 		$html=str_replace('ET4H_TICKETID',$eTicketID,$html);
-		$config =& JFactory::getConfig();
+		$config = JFactory::getConfig();
 		if(!HIKASHOP_J30){
 			$html=str_replace('ET4H_SITE_NAME',$config->getValue("config.sitename"),$html);
 		} else {
