@@ -30,7 +30,7 @@ class plgHikashopEtickets extends JPlugin
 			jimport('joomla.html.parameter');
 			$this->params = new JParameter( $plugin->params );
 		}
-		$this->debug=1;
+		$this->debug=0;
 		$this->database =& JFactory::getDBO();
 		$query = 'SELECT product_id FROM '.hikashop_table('eticket_info');
 		$this->database->setQuery($query);
