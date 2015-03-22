@@ -404,7 +404,7 @@ class plgHikashopEtickets extends JPlugin
 			// Variants ?
 			if ($this->debug) { JLog::add("Variants?", JLog::DEBUG, 'plg_hikashop_etickets');}
 			if ($this->debug) { JLog::add(var_export($element->characteristics,true), JLog::DEBUG, 'plg_hikashop_etickets');}
-			if (count($element->characteristics)!=0) {
+			if (property_exists($element,'characteristics') && count($element->characteristics)!=0) {
 if ($this->debug) { JLog::add("Variants", JLog::DEBUG, 'plg_hikashop_etickets');}
 
 				$query='SELECT * from  '.hikashop_table('product').' WHERE product_parent_id=\''.$element->product_id.'\'';
